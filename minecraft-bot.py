@@ -107,7 +107,7 @@ async def handleRegister(message, message_tokens):
 async def handleActivate(message, message_tokens):
     await message.channel.send('Activating newton.')
 
-    result = subprocess.run('~/wake-newton.sh', shell = True, executable="/bin/bash")
+    result = subprocess.run('~/wake-newton.sh', shell=True, executable='/bin/bash')
 
     if result.returncode == 0:
         print('Magic packet successfully sent.')
@@ -118,7 +118,12 @@ async def handleActivate(message, message_tokens):
 # check if newton is responding
 # should wait a certain amount of time before deciding newton is not responding
 async def handlePing(message, message_tokens):
-    await message.channel.send('pinging newton')
+    result = subprocess.run('ping -c 1 minecraft.avyx.home', shell=True, executable='/bin/bash')
+
+    if result.returncode == 0:
+        await message.channel.send('Newton is running.')
+    else:
+        await message.channel.send('Newton is not running.')
 
 # list with an extra set of commands
 # list running
