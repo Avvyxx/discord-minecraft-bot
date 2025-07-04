@@ -105,7 +105,15 @@ async def handleRegister(message, message_tokens):
         await message.channel.send(f'Who do you think you are, {username}')
 
 async def handleActivate(message, message_tokens):
-    await message.channel.send('activating machine')
+    await message.channel.send('Activating newton.')
+
+    result = subprocess.run('~/wake-newton.sh', shell = True, executable="/bin/bash")
+
+    if result.returncode == 0:
+        print('Magic packet successfully sent.')
+    else:
+        print('Magic packet unsucessfully sent.')
+        await message.channel.send('Failed to wake newton.')
 
 # check if newton is responding
 # should wait a certain amount of time before deciding newton is not responding
