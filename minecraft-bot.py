@@ -1,7 +1,8 @@
 admins = ['avvyxx']
+server_domain = 'minecraft.avyx.home'
 registered_servers = set()
 
-import discord, textwrap, subprocess, sys
+import discord, textwrap, subprocess, sys, requests, json
 
 def getUsername(UserorMember):
     return str(UserorMember).split('#')[0]
@@ -118,7 +119,7 @@ async def handleActivate(message, message_tokens):
 # check if newton is responding
 # should wait a certain amount of time before deciding newton is not responding
 async def handlePing(message, message_tokens):
-    result = subprocess.run('ping -c 1 minecraft.avyx.home', shell=True, executable='/bin/bash')
+    result = subprocess.run('ping -c 1 ' + server_domain, shell=True, executable='/bin/bash')
 
     if result.returncode == 0:
         await message.channel.send('Newton is running.')
@@ -133,22 +134,49 @@ async def handleList(message, message_tokens):
     if len(message_tokens) == 2:
         subcommand = message_tokens[1]
 
-        if subcommand == 'all':
-            await message.channel.send('Listing all servers')
-        elif subcommand == 'stopped':
-            await message.channel.send('Listing all stopped servers')
-        elif subcommand == 'running':
-            for server in registered_servers:
-                # check if server is running
-                pass
+        url = f'http://{server_domain}:8000/list'
+        json_response = json.loads(requests.get(url).text)
 
-            await message.channel.send('listing running servers')
+        if subcommand == 'status':
+            message_to_send = ''
+
+            for server_info in json_response:
+                message_to_send += f'**{server_info['name']}**:\n\tStatus: {discordInlineCode(server_info['state'])}\n\tDomain: {discordInlineCode(server_info['domain'])}\n\n'
+
+            await message.channel.send(message_to_send)
+        elif subcommand == 'stopped':
+            message_to_send = ', '.join([server_info['name'] for server_info in json_response if server_info['state'] == 'stopped'])
+
+            await message.channel.send(message_to_send)
+        elif subcommand == 'running':
+            message_to_send = ', '.join([server_info['name'] for server_info in json_response if server_info['state'] == 'running'])
+
+            await message.channel.send(message_to_send)
         elif subcommand == 'available':
-            await message.channel.send('Available servers: ' + ', '.join(registered_servers))
+            message_to_send = ', '.join([server_info['name'] for server_info in json_response])
+
+            await message.channel.send(message_to_send)
         else:
             await message.channel.send('Usage: ' + command_reference['list']['help']['usage'])
     else:
         await message.channel.send('Usage: ' + command_reference['list']['help']['usage'])
+
+async def handleStart(message, message_tokens):
+    if len(message_tokens) == 2:
+        server = message_tokens[1]
+
+        url = f'http://{server_domain}:8000/start/' + server
+        json_response = json.loads(requests.post(url).text)
+
+        if json_response[0] == 'Server started':
+            await message.channel.send(f'**{server}** started!.\nConnect at: {server.lower()}.avyx.home')
+        elif json_response[0] == 'Server startup failed':
+            await message.channel.send(f'**{server}** failed to start.')
+        else:
+            await message.channel.send('Something went horribly wrong. Contact luigi.')
+
+    else:
+        await message.channel.send('Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
 
 command_reference = {
     'help': {
@@ -193,14 +221,22 @@ command_reference = {
         'handler': handleList,
         'help': {
             'blurb': 'Lists running and available servers along with their domains.',
-            'usage': '/list <running | available>',
+            'usage': '/list <status | stopped | running | available>',
             'detailed': """
                         Subcommands:
-                        \- `all`: List all servers along with their state.
+                        \- `status`: List all servers along with their state and domain.
                         \- `stopped`: List servers that are stopped.
                         \- `running`: List servers that are currently running.
                         \- `available`: List servers that are available.
                         """
+        }
+    },
+    'start': {
+        'handler': handleStart,
+        'help': {
+            'blurb': 'Starts the specified Minecraft server.',
+            'usage': '/start <server name>',
+            'detailed': 'Is case sensitive, so if you want RLCraft `/start rlcraft` will not work.'
         }
     }
 }
