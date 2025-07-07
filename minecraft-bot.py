@@ -245,6 +245,8 @@ async def handleStart(message, message_tokens):
     else:
         await message.channel.send('Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
 
+# TODO: currently this will send "stop ENTER" to the tmux session, but if the server is not ready this may not work as intended
+# need to check if server is ready
 async def handleStop(message, message_tokens):
     if len(message_tokens) == 2:
         server = message_tokens[1]
