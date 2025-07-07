@@ -188,9 +188,9 @@ async def handlePing(message, message_tokens):
 
             await message.channel.send(message_to_send)
         else:
-            await message.channel.send('Usage: ' + command_reference['ping']['help']['usage'])
+            await message.channel.send('Usage: ' + discordInlineCode(command_reference['ping']['help']['usage']))
     else:
-        await message.channel.send('Usage: ' + command_reference['ping']['help']['usage'])
+        await message.channel.send('Usage: ' + discordInlineCode(command_reference['ping']['help']['usage']))
 
 
 # list with an extra set of commands
@@ -224,9 +224,9 @@ async def handleList(message, message_tokens):
 
             await message.channel.send(message_to_send)
         else:
-            await message.channel.send('Usage: ' + command_reference['list']['help']['usage'])
+            await message.channel.send('Usage: ' + discordInlineCode(command_reference['list']['help']['usage']))
     else:
-        await message.channel.send('Usage: ' + command_reference['list']['help']['usage'])
+        await message.channel.send('Usage: ' + discordInlineCode(command_reference['list']['help']['usage']))
 
 async def handleStart(message, message_tokens):
     if len(message_tokens) == 2:
@@ -243,7 +243,7 @@ async def handleStart(message, message_tokens):
             await message.channel.send('Something went horribly wrong. Contact luigi.')
 
     else:
-        await message.channel.send('Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
+        await message.channel.send(f'Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
 
 command_reference = {
     'help': {
@@ -301,10 +301,10 @@ command_reference = {
             'usage': '/list <status | stopped | running | available>',
             'detailed': """
                         Subcommands:
-                        \- `status`: List all servers along with their state and domain.
-                        \- `stopped`: List servers that are stopped.
-                        \- `running`: List servers that are currently running.
-                        \- `available`: List servers that are available.
+                        \\- `status`: List all servers along with their state and domain.
+                        \\- `stopped`: List servers that are stopped.
+                        \\- `running`: List servers that are currently running.
+                        \\- `available`: List servers that are available.
                         """
         }
     },
