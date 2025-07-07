@@ -206,6 +206,10 @@ async def handleList(message, message_tokens):
         url = f'http://{server_domain}:8000/list'
         json_response = json.loads(requests.get(url).text)
 
+        if not json_response:
+            await message.channel.send('There are no available servers.')
+            return
+
         if subcommand == 'status':
             message_to_send = ''
 
@@ -216,11 +220,17 @@ async def handleList(message, message_tokens):
         elif subcommand == 'stopped':
             message_to_send = ', '.join([server_info['name'] for server_info in json_response if server_info['state'] == 'stopped'])
 
-            await message.channel.send(message_to_send)
+            if message_to_send:
+                await message.channel.send(message_to_send)
+            else:
+                await message.channel.send('All servers are running.')
         elif subcommand == 'running':
             message_to_send = ', '.join([server_info['name'] for server_info in json_response if server_info['state'] == 'running'])
 
-            await message.channel.send(message_to_send)
+            if message_to_send:
+                await message.channel.send(message_to_send)
+            else:
+                await message.channel.send('There are no servers running.')
         elif subcommand == 'available':
             message_to_send = ', '.join([server_info['name'] for server_info in json_response])
 
