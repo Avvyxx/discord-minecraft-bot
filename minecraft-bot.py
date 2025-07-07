@@ -12,7 +12,7 @@ load_dotenv()
 if (token_env_name not in os.environ):
     raise Exception(token_env_name + ' not defined in .env.')
 
-token = os.getenv('TOKEN')
+token = os.getenv(token_env_name)
 
 is_locked = False
 
