@@ -242,6 +242,7 @@ async def handleStart(message, message_tokens):
         elif json_response[0] == 'Server already started':
             await message.channel.send('Server already started.')
         else:
+            print(json_response)
             await message.channel.send('Something went horribly wrong. Contact an admin.')
 
     else:
@@ -265,6 +266,7 @@ async def handleStop(message, message_tokens):
         elif json_response[0] == 'Server does not exist':
             await message.channel.send('Server doesn\'t exist.')
         else:
+            print(json_response)
             await message.channel.send('Something went horribly wrong. Contact an admin.')
 
     else:
