@@ -245,6 +245,27 @@ async def handleStart(message, message_tokens):
     else:
         await message.channel.send('Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
 
+async def handleStop(message, message_tokens):
+    if len(message_tokens) == 2:
+        server = message_tokens[1]
+
+        url = f'http://{server_domain}:8000/stop/' + server
+        json_response = json.loads(requests.post(url).text)
+
+        if json_response[0] == 'Server stopped':
+            await message.channel.send(f'**{server}** stopped.')
+        elif json_response[0] == 'Server stop failed':
+            await message.channel.send(f'**{server}** failed to stop.')
+        elif json_response[0] == 'Server already stopped':
+            await message.channel.send('Server already stopped.')
+        elif json_response[0] == 'Server does not exist':
+            await message.channel.send('Server doesn\'t exist.')
+        else:
+            await message.channel.send('Something went horribly wrong. Contact an admin.')
+
+    else:
+        await message.channel.send('Usage: ' + discordInlineCode(command_reference['stop']['help']['usage']))
+
 command_reference = {
     'help': {
         'handler': handleHelp,
@@ -315,6 +336,15 @@ command_reference = {
             'blurb': 'Starts the specified Minecraft server.',
             'usage': '/start <server name>',
             'detailed': 'Is case sensitive, so if you want RLCraft `/start rlcraft` will not work.'
+        }
+    },
+    'stop': {
+        'handler': handleStop,
+        'is_privileged': False,
+        'help': {
+            'blurb': 'Stops the specified Minecraft server.',
+            'usage': '/stop <server name>',
+            'detailed': 'Is case sensitive, so if you want to stop Cobbleverse `/stop cobbleverse` will not work.'
         }
     },
     'lock': {
