@@ -34,8 +34,7 @@ class MyClient(discord.Client):
                     await handleCommand(message, message_tokens)
                 except Exception as e:
                     # TODO: Ping me, or everyone in admins list
-                    await message.channel.send(f'There seems to have been an error: `{type(e).__name__}: {str(e)}`')
-                    await message.channel.send('idk how to make it ping me yet so someone else do it')
+                    await message.channel.send(f'There seems to have been an error: `{type(e).__name__}: {str(e)}`\nPlease ping an admin.')
 
 async def handleCommand(message, message_tokens):
     if not message_tokens:
