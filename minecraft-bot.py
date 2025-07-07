@@ -239,6 +239,8 @@ async def handleStart(message, message_tokens):
             await message.channel.send(f'**{server}** started!\nConnect at: `{server.lower()}.avyx.home`')
         elif json_response[0] == 'Server startup failed':
             await message.channel.send(f'**{server}** failed to start.')
+        elif json_response[0] == 'Server already started':
+            await message.channel.send('Server already started.')
         else:
             await message.channel.send('Something went horribly wrong. Contact an admin.')
 
