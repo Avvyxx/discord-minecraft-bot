@@ -20,6 +20,9 @@ def getUsername(UserorMember):
 def discordInlineCode(s):
     return f'`{s}`'
 
+def isAdmin(UserorMember):
+    return getUsername(UserorMember) in admins
+
 class MyClient(discord.Client):
     async def on_read(self):
         print('Logged on as', self.user)
@@ -43,8 +46,13 @@ async def handleCommand(message, message_tokens):
     command = message_tokens[0]
 
     if command in command_reference:
-        await command_reference[command]['handler'](message, message_tokens)
+        is_privileged = command_reference[command]['is_privileged']
+        is_admin = isAdmin(message.author)
 
+        if (is_privileged and is_admin) or (not is_privileged):
+            await command_reference[command]['handler'](message, message_tokens)
+        else:
+            await message.channel.send(f'Who do you think you are, {getUsername(message.author)}.')
     else:
         await message.channel.send('Unkown command: ' + command)
 
@@ -187,6 +195,7 @@ async def handleStart(message, message_tokens):
 command_reference = {
     'help': {
         'handler': handleHelp,
+        'is_privileged': False,
         'help': {
             'blurb': 'Lists available commands, how to use them, and what they do.',
             'usage': '/help [command]',
@@ -201,6 +210,7 @@ command_reference = {
     },
     'activate': {
         'handler': handleActivate,
+        'is_privileged': False,
         'help': {
             'blurb': 'Activate newton, the machine that will be running the Minecraft servers.',
             'usage': '/activate',
@@ -209,6 +219,7 @@ command_reference = {
     },
     'register': {
         'handler': handleRegister,
+        'is_privileged': True,
         'help': {
             'blurb': 'This is an admin command, it makes it easy for me to register servers with the bot.',
             'usage': '/register <server name> [server names...]',
@@ -217,6 +228,7 @@ command_reference = {
     },
     'ping': {
         'handler': handlePing,
+        'is_privileged': False,
         'help': {
             'blurb': 'This is a temporary command that you can use to know if newton is on or not.',
             'usage': '/ping [amount of time to wait in seconds]',
@@ -225,6 +237,7 @@ command_reference = {
     },
     'list': {
         'handler': handleList,
+        'is_privileged': False,
         'help': {
             'blurb': 'Lists running and available servers along with their domains.',
             'usage': '/list <status | stopped | running | available>',
@@ -239,6 +252,7 @@ command_reference = {
     },
     'start': {
         'handler': handleStart,
+        'is_privileged': False,
         'help': {
             'blurb': 'Starts the specified Minecraft server.',
             'usage': '/start <server name>',
