@@ -2,6 +2,8 @@ admins = ['avvyxx']
 server_domain = 'minecraft.avyx.home'
 registered_servers = set()
 
+from util import *
+
 import discord, textwrap, subprocess, sys, requests, json, os
 from dotenv import load_dotenv
 
@@ -15,26 +17,6 @@ if (token_env_name not in os.environ):
 token = os.getenv(token_env_name)
 
 is_locked = False
-
-def getUsername(UserorMember):
-    return str(UserorMember).split('#')[0]
-
-def discordInlineCode(s):
-    return f'`{s}`'
-
-def isAdmin(UserorMember):
-    return getUsername(UserorMember) in admins
-
-def ping_machine():
-    result = subprocess.run('ping -c 1 ' + server_domain, shell=True, executable='/bin/bash')
-
-    return result.returncode == 0
-
-def ping_api():
-    url = f'http://{server_domain}:8000/ping'
-    json_response = json.loads(requests.get(url).text)
-
-    return json_response[0] == 'pong'
 
 class MyClient(discord.Client):
     async def on_read(self):
@@ -60,7 +42,7 @@ async def handleCommand(message, message_tokens):
 
     if command in command_reference:
         is_privileged = command_reference[command]['is_privileged']
-        is_admin = isAdmin(message.author)
+        is_admin = getUsername(message.author) in admins
 
         if is_locked:
             if command == 'release' and is_admin:
@@ -171,8 +153,8 @@ async def handlePing(message, message_tokens):
 
     # TODO: condense this somehow
     if tokens_amount == 1:
-        if ping_machine():
-            if ping_api():
+        if ping_machine(server_domain):
+            if ping_api(server_domain):
                 await message.channel.send('Both newton and the API are runnning.')
             else:
                 await message.channel.send('Newton is running but the API is not running.')
@@ -182,11 +164,11 @@ async def handlePing(message, message_tokens):
         subcommand = message_tokens[1]
 
         if subcommand == 'machine':
-            message_to_send = 'Newton is running.' if ping_machine() else 'Newton is not running.'
+            message_to_send = 'Newton is running.' if ping_machine(server_domain) else 'Newton is not running.'
 
             await message.channel.send(message_to_send)
         elif subcommand == 'api':
-            message_to_send = 'API is running.' if ping_api() else 'API is not running.'
+            message_to_send = 'API is running.' if ping_api(server_domain) else 'API is not running.'
 
             await message.channel.send(message_to_send)
         else:
