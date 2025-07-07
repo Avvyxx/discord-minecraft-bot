@@ -240,7 +240,7 @@ async def handleStart(message, message_tokens):
         elif json_response[0] == 'Server startup failed':
             await message.channel.send(f'**{server}** failed to start.')
         else:
-            await message.channel.send('Something went horribly wrong. Contact luigi.')
+            await message.channel.send('Something went horribly wrong. Contact an admin.')
 
     else:
         await message.channel.send(f'Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
