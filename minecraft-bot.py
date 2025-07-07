@@ -25,6 +25,17 @@ def discordInlineCode(s):
 def isAdmin(UserorMember):
     return getUsername(UserorMember) in admins
 
+def ping_machine():
+    result = subprocess.run('ping -c 1 ' + server_domain, shell=True, executable='/bin/bash')
+
+    return reslt.returncode
+
+def ping_api():
+    url = f'http://{server_domain}:8000/ping'
+    json_response = json.loads(requests.get(server_domain))
+
+    return json_response[0] == 'pong'
+
 class MyClient(discord.Client):
     async def on_read(self):
         print('Logged on as', self.user)
@@ -154,9 +165,9 @@ async def handleActivate(message, message_tokens):
 # check if newton is responding
 # should wait a certain amount of time before deciding newton is not responding
 async def handlePing(message, message_tokens):
-    result = subprocess.run('ping -c 1 ' + server_domain, shell=True, executable='/bin/bash')
+    ping_result = ping_machine()
 
-    if result.returncode == 0:
+    if ping_result == 0:
         await message.channel.send('Newton is running.')
     else:
         await message.channel.send('Newton is not running.')
