@@ -243,7 +243,7 @@ async def handleStart(message, message_tokens):
             await message.channel.send('Something went horribly wrong. Contact an admin.')
 
     else:
-        await message.channel.send(f'Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
+        await message.channel.send('Usage: ' + discordInlineCode(command_reference['start']['help']['usage']))
 
 command_reference = {
     'help': {
