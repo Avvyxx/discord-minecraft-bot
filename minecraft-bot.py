@@ -14,6 +14,8 @@ if (token_env_name not in os.environ):
 
 token = os.getenv('TOKEN')
 
+is_locked = False
+
 def getUsername(UserorMember):
     return str(UserorMember).split('#')[0]
 
@@ -49,12 +51,34 @@ async def handleCommand(message, message_tokens):
         is_privileged = command_reference[command]['is_privileged']
         is_admin = isAdmin(message.author)
 
-        if (is_privileged and is_admin) or (not is_privileged):
+        if is_locked:
+            if command == 'release' and is_admin:
+                await handleRelease(message, message_tokens)
+            else:
+                await message.channel.send('Currently not accepting commands.')
+        elif (is_privileged and is_admin) or (not is_privileged) or (command == 'release' and is_admin):
             await command_reference[command]['handler'](message, message_tokens)
         else:
             await message.channel.send(f'Who do you think you are, {getUsername(message.author)}.')
     else:
         await message.channel.send('Unkown command: ' + command)
+
+async def handleLock(message, message_tokens):
+    global is_locked
+
+    is_locked = True
+
+    await message.channel.send('Commands locked.')
+
+async def handleRelease(message, message_tokens):
+    global is_locked
+
+    if is_locked:
+        is_locked = False
+
+        await message.channel.send('Lock released.')
+    else:
+        await message.channel.send('There is no lock.')
 
 # list all for /help
 # list specified for /help <command>
@@ -254,6 +278,24 @@ command_reference = {
             'blurb': 'Starts the specified Minecraft server.',
             'usage': '/start <server name>',
             'detailed': 'Is case sensitive, so if you want RLCraft `/start rlcraft` will not work.'
+        }
+    },
+    'lock': {
+        'handler': handleLock,
+        'is_privileged': True,
+        'help': {
+            'blurb': 'Prevents any commands from being carried out until lock is released.',
+            'usage': '/lock',
+            'detailed': 'Privileged command.'
+        }
+    },
+    'release': {
+        'handler': handleRelease,
+        'is_privileged': True,
+        'help': {
+            'blurb': 'Releases lock.',
+            'usage': '/release',
+            'detailed': 'Privileged command.'
         }
     }
 }
