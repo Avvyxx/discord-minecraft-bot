@@ -2,7 +2,17 @@ admins = ['avvyxx']
 server_domain = 'minecraft.avyx.home'
 registered_servers = set()
 
-import discord, textwrap, subprocess, sys, requests, json
+import discord, textwrap, subprocess, sys, requests, json, os
+from dotenv import load_dotenv
+
+token_env_name = 'TOKEN'
+
+load_dotenv()
+
+if (token_env_name not in os.environ):
+    raise Exception(token_env_name + ' not defined in .env.')
+
+token = os.getenv('TOKEN')
 
 def getUsername(UserorMember):
     return str(UserorMember).split('#')[0]
