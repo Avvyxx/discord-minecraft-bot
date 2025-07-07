@@ -27,18 +27,15 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         if message.author != self.user:
             # check if message is command
-            if message.content:
-                if (message.content[0] == '/'):
-                    message_tokens = message.content[1:].split()
+            if (message.content[0] == '/'):
+                message_tokens = message.content[1:].split()
 
-                    try:
-                        await handleCommand(message, message_tokens)
-                    except Exception as e:
-                        # TODO: Ping me, or everyone in admins list
-                        await message.channel.send(f'There seems to have been an error: `{type(e).__name__}: {str(e)}`')
-                        await message.channel.send('idk how to make it ping me yet so someone else do it')
-            else:
-                await message.channel.send(f'Somehow {getUsername(message.author)} managed to send an empty message.')
+                try:
+                    await handleCommand(message, message_tokens)
+                except Exception as e:
+                    # TODO: Ping me, or everyone in admins list
+                    await message.channel.send(f'There seems to have been an error: `{type(e).__name__}: {str(e)}`')
+                    await message.channel.send('idk how to make it ping me yet so someone else do it')
 
 async def handleCommand(message, message_tokens):
     if not message_tokens:
