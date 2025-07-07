@@ -76,10 +76,7 @@ async def handleHelp(message, message_tokens):
 
             message_to_send = help_reference['blurb'].strip() + '\n'
 
-            if help_reference['detailed']:
-                message_to_send += '\n' + textwrap.dedent(help_reference['detailed']).strip() + '\n\n'
-            else:
-                message_to_send += '\n'
+            message_to_send += '\n' + textwrap.deden(help_reference['detailed']).strip() + '\n\n' if help_reference['detailed'] else '\n'
 
             message_to_send += 'Usage: ' + discordInlineCode(help_reference['usage'])
 
