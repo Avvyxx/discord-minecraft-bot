@@ -87,7 +87,7 @@ async def handleHelp(message, message_tokens):
         message_to_send = 'Available commands:\n'
 
         for command in command_reference:
-            message_to_send += f'\- {discordInlineCode(command)}: {command_reference[command]['help']['blurb']}\n'
+            message_to_send += f'\\- {discordInlineCode(command)}: {command_reference[command]['help']['blurb']}\n'
 
         message_to_send += 'Try: `/help list`'
 
@@ -204,7 +204,7 @@ async def handleStart(message, message_tokens):
         json_response = json.loads(requests.post(url).text)
 
         if json_response[0] == 'Server started':
-            await message.channel.send(f'**{server}** started!.\nConnect at: {server.lower()}.avyx.home')
+            await message.channel.send(f'**{server}** started!\nConnect at: `{server.lower()}.avyx.home`')
         elif json_response[0] == 'Server startup failed':
             await message.channel.send(f'**{server}** failed to start.')
         else:
@@ -222,10 +222,10 @@ command_reference = {
             'usage': '/help [command]',
             'detailed': """
                         Argument syntax explanation:
-                        \- `[]` means the argument is optional
-                        \- `<>` means the argument is necessary
-                        \- `|`means or but not both and not neither (xor)
-                        \- `...` means unspecified number of arguments
+                        \\- `[]` means the argument is optional
+                        \\- `<>` means the argument is necessary
+                        \\- `|`means or but not both and not neither (xor)
+                        \\- `...` means unspecified number of arguments
                         """
         }
     },
