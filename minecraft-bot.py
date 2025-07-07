@@ -28,11 +28,11 @@ def isAdmin(UserorMember):
 def ping_machine():
     result = subprocess.run('ping -c 1 ' + server_domain, shell=True, executable='/bin/bash')
 
-    return reslt.returncode
+    return result.returncode == 0
 
 def ping_api():
     url = f'http://{server_domain}:8000/ping'
-    json_response = json.loads(requests.get(server_domain))
+    json_response = json.loads(requests.get(url).text)
 
     return json_response[0] == 'pong'
 
@@ -165,12 +165,33 @@ async def handleActivate(message, message_tokens):
 # check if newton is responding
 # should wait a certain amount of time before deciding newton is not responding
 async def handlePing(message, message_tokens):
-    ping_result = ping_machine()
+    tokens_amount = len(message_tokens)
 
-    if ping_result == 0:
-        await message.channel.send('Newton is running.')
+    # TODO: condense this somehow
+    if tokens_amount == 1:
+        if ping_machine():
+            if ping_api():
+                await message.channel.send('Both newton and the API are runnning.')
+            else:
+                await message.channel.send('Newton is running but the API is not running.')
+        else:
+            await message.channel.send('Newton is not running.')
+    elif tokens_amount == 2:
+        subcommand = message_tokens[1]
+
+        if subcommand == 'machine':
+            message_to_send = 'Newton is running.' if ping_machine() else 'Newton is not running.'
+
+            await message.channel.send(message_to_send)
+        elif subcommand == 'api':
+            message_to_send = 'API is running.' if ping_api() else 'API is not running.'
+
+            await message.channel.send(message_to_send)
+        else:
+            await message.channel.send('Usage: ' + command_reference['ping']['help']['usage'])
     else:
-        await message.channel.send('Newton is not running.')
+        await message.channel.send('Usage: ' + command_reference['ping']['help']['usage'])
+
 
 # list with an extra set of commands
 # list running
@@ -262,9 +283,14 @@ command_reference = {
         'handler': handlePing,
         'is_privileged': False,
         'help': {
-            'blurb': 'This is a temporary command that you can use to know if newton is on or not.',
-            'usage': '/ping [amount of time to wait in seconds]',
-            'detailed': 'TODO: `/activate` should message the server when newton wakes up.'
+            'blurb': 'Checks if either newton or the API are running.',
+            'usage': '/ping [machine | api]',
+            'detailed': """
+                        Subcommands:
+                        \\- `machine`: Check if newton itself is on.
+                        \\- `api`: Check if the api is running.
+                        Defaults to `machine` if no command is specified.
+                        """
         }
     },
     'list': {
