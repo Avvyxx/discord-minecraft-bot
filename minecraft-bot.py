@@ -95,7 +95,9 @@ async def handleRelease(message, message_tokens):
 # list specified for /help <command>
 async def handleHelp(message, message_tokens):
     if len(message_tokens) == 1:
-        message_to_send = 'Available commands:\n'
+        message_to_send = textwrap.dedent(command_reference['help']['help']['detailed']) + '\n'
+
+        message_to_send += 'Available commands:\n'
 
         for command in command_reference:
             message_to_send += f'\\- {discordInlineCode(command)}: {command_reference[command]['help']['blurb']}\n'
